@@ -106,12 +106,12 @@ class _ConcurrentDaemon(Daemon):
     Not inherited directly into final classes.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, qsize, wcount, *args, **kwargs):
         """Partial setup the new concurrent instance."""
         # maximum allowed queue size
-        self.qsize = kwargs.pop('qsize', config.DAEMON.QSIZE)
+        self.qsize = qsize or config.DAEMON.QSIZE
         # desired number of workers
-        self.wcount = kwargs.pop('wcount', config.DAEMON.WORKERS)
+        self.wcount = wcount or config.DAEMON.WORKERS
         super(_ConcurrentDaemon, self).__init__(*args, **kwargs)
 
         self.workers = list()    # workers as objects
