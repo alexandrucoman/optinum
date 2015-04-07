@@ -4,7 +4,6 @@ from optinum.executor import Executor
 
 
 def main():
-    executor = Executor()
     reports = {}
     tasks = [
         report.Task(
@@ -24,11 +23,18 @@ def main():
             start=-3, stop=3, precision=2,
         ),
     ]
+
+    executor = Executor()
+    worker = executor.start_worker()
+
     for algorithm in ('HCFirstImprovement', 'HCBestImprovement'):
         for task in tasks:
             algorithm_report = report.HCReport(executor, algorithm, task)
             reports[(algorithm, task)] = algorithm_report
             print(algorithm_report.compute(execution_count=10))
+
+    executor.stop.set()
+    worker.join()
 
 
 if __name__ == "__main__":
