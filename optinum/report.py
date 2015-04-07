@@ -7,6 +7,7 @@ import threading
 import time
 
 import six
+from prettytable import PrettyTable
 
 from optinum import config
 from optinum import data
@@ -140,3 +141,39 @@ class Report(object):
             return False
 
         return self._prepare_report
+
+
+class HCReport(Report):
+
+    def __init__(self, executor, algorithm, task, max_evaluations=50):
+        super(HCReport, self).__init__(executor, algorithm, task)
+        self._max_evaluation = max_evaluations
+
+    def _get_job(self):
+        return Job(self._algorithm, self._task,
+                   max_evaluations=self._max_evaluation)
+
+    def _report_header(self):
+        table = PrettyTable(header=False)
+        table.add_row(["Algorithm", self._algorithm])
+        table.add_row(["Objective function", self._task.objective])
+        table.add_row(["Variables", self._task.variables])
+        table.add_row(["Space", self._task.search_space])
+        return table
+
+    def _report_content(self):
+        table = PrettyTable(["No.", "Evaluations", "Score"])
+        for index, job in enumerate(self._jobs):
+            job_result = job.result
+            if job_result.status:
+                job_data = job_result.data
+                table.add_row([index, job_data["evaluations"],
+                              job_data["score"]])
+            else:
+                table.add_row([index, '-', 'Error'])
+
+    def _prepare_report(self):
+        header = self._report_header()
+        content = self._report_content()
+        print(header)
+        print(content)
