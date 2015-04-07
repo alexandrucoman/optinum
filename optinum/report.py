@@ -65,7 +65,7 @@ class Job(object):
     _RESULT = collections.namedtuple('Result', ['status', 'data'])
 
     def __init__(self, algorithm, task, *args, **kwargs):
-        algorithm = factory.get_algorithm(algorithm)
+        algorithm = factory.algorithm(algorithm)
         if not algorithm:
             raise ValueError('Unsupported algorithm.')
 
@@ -104,6 +104,7 @@ class Report(object):
     def __init__(self, executor, algorithm, task):
         self._algorithm = algorithm
         self._executor = executor
+        self._task = task
         self._jobs = []
         self._stop_event = threading.Event()
 

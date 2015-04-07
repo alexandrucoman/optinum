@@ -1,7 +1,7 @@
 import threading
 
-from optinum.config import config
-from optinum.data import daemon
+from optinum import config
+from optinum import daemon
 
 
 class Executor(daemon.ThreadDaemon):

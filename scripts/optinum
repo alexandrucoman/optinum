@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 from optinum import report
+from optinum.executor import Executor
 
 
 def main():
+    executor = Executor()
     reports = {}
     tasks = [
         report.Task(
@@ -24,9 +26,9 @@ def main():
     ]
     for algorithm in ('HCFirstImprovement', 'HCBestImprovement'):
         for task in tasks:
-            algorithm_report = report.Report(algorithm, task)
+            algorithm_report = report.HCReport(executor, algorithm, task)
             reports[(algorithm, task)] = algorithm_report
-            algorithm_report.start()
+            print(algorithm_report.compute(execution_count=10))
 
 
 if __name__ == "__main__":
