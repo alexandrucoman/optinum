@@ -1,6 +1,7 @@
 """
 Utilities for creating a report.
 """
+import collections
 import threading
 
 from optinum import data
@@ -55,6 +56,8 @@ class Task(object):
 
 class Job(object):
 
+    _RESULT = collections.namedtuple('Result', ['status', 'data'])
+
     def __init__(self, algorithm, task, **conf):
         algorithm = factory.get_algorithm(algorithm)
         if not algorithm:
@@ -62,7 +65,27 @@ class Job(object):
 
         self._algorithm(**conf)
         self._task = task
+        self._done = False
+        self._status = False
+        self._result = False
+
         self._lock = threading.Lock()
+
+    @property
+    def is_done(self):
+        return self._done
+
+    @property
+    def result(self):
+        return self._RESULT(self._status, self._algorithm.result)
+
+    def done(self, status, result):
+        self._done = True
+        self._status = status
+        if status:
+            self._result = self._algorithm.result
+        else:
+            self._result = result
 
     def start(self):
         self._algorithm.run()
