@@ -65,6 +65,7 @@ class HillClimbing(Algorithm):
         self._max_evaluations = max_evaluations
         self._chromosome = None
         self._score = None
+        self._candidate_solutions = []
 
     @property
     def depth_search(self):
@@ -80,6 +81,7 @@ class HillClimbing(Algorithm):
     def update_chromosome(self, chromosome, score):
         self._chromosome = chromosome
         self._score = score
+        self._candidate_solutions.append(score)
 
     def prepare_result(self, error):
         if error:
@@ -89,7 +91,8 @@ class HillClimbing(Algorithm):
             'max_evaluations': self._max_evaluations,
             'evaluations': self._evaluations,
             'chromosome': self._chromosome,
-            'score': self._score
+            'score': self._score,
+            'candidate_solutions': self._candidate_solutions
         }
 
     def compute(self):
