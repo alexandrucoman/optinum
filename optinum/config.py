@@ -26,3 +26,9 @@ class DAEMON:
     QSIZE = 0       # default task processor queue size (0 - unlimited)
     # other
     LOOP = True     # process the same tasks indefinitely
+
+
+class REPORT:
+
+    """Report specific settings."""
+    RETRY_INTERVAL = 1  # default time between interations

@@ -1,9 +1,14 @@
 """
 Utilities for creating a report.
 """
+import abc
 import collections
 import threading
+import time
 
+import six
+
+from optinum import config
 from optinum import data
 from optinum import factory
 
@@ -90,3 +95,48 @@ class Job(object):
 
     def start(self):
         self._algorithm.run()
+
+
+@six.add_metaclass(abc.ABCMeta)
+class Report(object):
+
+    def __init__(self, executor, algorithm, task):
+        self._algorithm = algorithm
+        self._executor = executor
+        self._jobs = []
+        self._stop_event = threading.Event()
+
+    @abc.abstractmethod
+    def _get_job(self):
+        pass
+
+    @abc.abstractmethod
+    def _prepare_report(self):
+        pass
+
+    def _wait_for_jobs(self):
+        while not self._stop_event.is_set():
+            try:
+                report_done = True
+                for job in self._jobs:
+                    if not job.is_done:
+                        report_done = False
+                        break
+                if report_done:
+                    return True
+                time.sleep(config.REPORT.RETRY_INTERVAL)
+            except KeyboardInterrupt:
+                self._stop_event.set()
+
+        return False
+
+    def compute(self, execution_count):
+        for index in range(execution_count):
+            job = self._get_job()           # Get a new job
+            self._executor.add_task(job)    # Add it to the processing queue
+            self._jobs.append(job)          # Keep a link to it
+
+        if not self._wait_for_jobs():
+            return False
+
+        return self._prepare_report
