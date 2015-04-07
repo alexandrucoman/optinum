@@ -21,8 +21,8 @@ class Task(object):
         if not self._objective_function:
             raise ValueError('Invalid name for the objective function.')
 
-        self._space = data.Space(start, stop, precision)
-        if not self._space:
+        self._search_space = data.Space(start, stop, precision)
+        if not self._search_space:
             raise ValueError('Invalid information provided for the space.')
 
     @property
@@ -42,8 +42,8 @@ class Task(object):
         return self._precision
 
     @property
-    def space(self):
-        return self._space
+    def search_space(self):
+        return self._search_space
 
     @property
     def start(self):
@@ -58,12 +58,13 @@ class Job(object):
 
     _RESULT = collections.namedtuple('Result', ['status', 'data'])
 
-    def __init__(self, algorithm, task, **conf):
+    def __init__(self, algorithm, task, *args, **kwargs):
         algorithm = factory.get_algorithm(algorithm)
         if not algorithm:
             raise ValueError('Unsupported algorithm.')
 
-        self._algorithm(**conf)
+        self._algorithm = algorithm(task.objective_function, task.variables,
+                                    task.search_space, *args, **kwargs)
         self._task = task
         self._done = False
         self._status = False
