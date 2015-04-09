@@ -14,6 +14,7 @@ except ImportError:
     import Queue as queue
 
 from optinum import config
+from optinum import log
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -22,7 +23,7 @@ class Daemon(object):
     """Abstract base class for simple daemons."""
 
     def __init__(self, name, debug=config.MISC.DEBUG,
-                 delay=config.DAEMON.DELAY, loop=config.DAEMON.LOOP):
+                 delay=config.DAEMON.FINEDELAY, loop=config.DAEMON.LOOP):
         """Setup a new instance."""
         # refine name
         if not name:
@@ -85,7 +86,7 @@ class Daemon(object):
     def start(self):
         """Starts a series of workers and processes incoming tasks."""
         self.prologue()
-        while True:
+        while not self.stop.is_set():
             try:
                 for task in self.task_generator():
                     self.put_task(task)
@@ -94,6 +95,7 @@ class Daemon(object):
                     break
                 time.sleep(self.delay)
             except KeyboardInterrupt:
+                log.debug("Keyboard Interrupt received.")
                 self.interrupted()
                 break
         self.epilogue()

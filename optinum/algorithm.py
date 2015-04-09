@@ -5,6 +5,7 @@ import abc
 import random
 import six
 
+from optinum import log
 from optinum.data import Chromosome
 
 
@@ -96,6 +97,7 @@ class HillClimbing(Algorithm):
         }
 
     def compute(self):
+        log.debug("%(algorithm)s is starging...", {"algorithm": self.name})
         self._chromosome = Chromosome.random(self.variables, self.space)
         self._score = self.evaluate(self._chromosome)
         self._evaluations = 1
@@ -124,7 +126,7 @@ class HCFirstImprovement(HillClimbing):
     def move_operator(self):
         genetic_info = self._chromosome.get_raw_data()
         index_list = range(len(genetic_info))
-        random.shufle(index_list)
+        random.shuffle(index_list)
         for index in index_list:
             hamming_neighbor = list(genetic_info)
             hamming_neighbor[index] = int(not(genetic_info[index]))

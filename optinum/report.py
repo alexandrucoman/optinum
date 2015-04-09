@@ -12,6 +12,7 @@ from prettytable import PrettyTable
 from optinum import config
 from optinum import data
 from optinum import factory
+from optinum import log
 
 
 class Task(object):
@@ -117,7 +118,9 @@ class Report(object):
         pass
 
     def _wait_for_jobs(self):
+        log.debug("Waiting until the jobs are done.")
         while not self._stop_event.is_set():
+            log.debug("Check results for ")
             try:
                 report_done = True
                 for job in self._jobs:
@@ -128,12 +131,15 @@ class Report(object):
                     return True
                 time.sleep(config.REPORT.RETRY_INTERVAL)
             except KeyboardInterrupt:
+                log.debug('Keyboard Interrupt received.')
                 self._stop_event.set()
 
         return False
 
     def compute(self, execution_count):
         for index in range(execution_count):
+            log.debug('Generate new job #%(index)s for: %(algorithm)s',
+                      {"index": index, "algorithm": self._algorithm})
             job = self._get_job()           # Get a new job
             self._executor.add_task(job)    # Add it to the processing queue
             self._jobs.append(job)          # Keep a link to it
