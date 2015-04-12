@@ -16,9 +16,9 @@ except ImportError:
 @six.add_metaclass(abc.ABCMeta)
 class BaseWorker(object):
 
-    """Abstract base class for simple daemons."""
+    """Abstract base class for simple workers."""
 
-    def __init__(self, name, debug, delay, loop):
+    def __init__(self, debug, delay, loop, name=None):
         """Setup a new instance."""
         # refine name
         if not name:
@@ -99,7 +99,7 @@ class BaseWorker(object):
 
 class ConcurrentWorker(BaseWorker):
 
-    """Abstract base class for concurrent daemons.
+    """Abstract base class for concurrent workers.
 
     Not inherited directly into final classes.
     """
