@@ -32,3 +32,11 @@ class REPORT:
 
     """Report specific settings."""
     RETRY_INTERVAL = 1  # default time between interations
+
+
+class STATUS:
+
+    NOTSET = 'notset'
+    RUNNING = 'running'
+    DONE = 'done'
+    ERROR = 'error'

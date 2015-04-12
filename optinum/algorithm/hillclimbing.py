@@ -1,72 +1,21 @@
-"""
-Implementation of the algorithms used for solving problemes.
-"""
 import abc
 import random
+
 import six
 
-from optinum import log
+from optinum.worker import algorithm
 from optinum.data import Chromosome
 
-
-@six.add_metaclass(abc.ABCMeta)
-class Algorithm(object):
-
-    def __init__(self, objective_function, variables, search_space):
-        self._objective_function = objective_function
-        self._search_space = search_space
-        self._variables = variables
-        self._name = self.__class__.__name__
-        self._result = {}
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def space(self):
-        return self._search_space
-
-    @property
-    def objective_function(self):
-        return self._objective_function
-
-    @property
-    def variables(self):
-        return self._variables
-
-    @property
-    def result(self):
-        return self._result
-
-    @abc.abstractmethod
-    def compute(self):
-        pass
-
-    @abc.abstractmethod
-    def prepare_result(self, error):
-        pass
-
-    def run(self):
-        try:
-            self.compute()
-        except (IndexError, ValueError, TypeError) as exc:
-            self.prepare_result(exc)
-        self.prepare_result(False)
+__all__ = ['HCFirstImprovement', 'HCBestImprovement']
 
 
 @six.add_metaclass(abc.ABCMeta)
-class HillClimbing(Algorithm):
+class HillClimbing(algorithm.Algorithm):
 
-    def __init__(self, objective_function, variables, search_space,
-                 max_evaluations=50):
-        super(HillClimbing, self).__init__(objective_function, variables,
-                                           search_space)
+    def __init__(self, max_evaluations=50):
+        super(HillClimbing, self).__init__()
         self._evaluations = 1
         self._max_evaluations = max_evaluations
-        self._chromosome = None
-        self._score = None
-        self._candidate_solutions = []
 
     @property
     def depth_search(self):
@@ -77,28 +26,14 @@ class HillClimbing(Algorithm):
         pass
 
     def evaluate(self, chromosome):
-        return self.objective_function.compute(chromosome)
+        return self.task.objective_function.compute(chromosome)
 
     def update_chromosome(self, chromosome, score):
         self._chromosome = chromosome
         self._score = score
-        self._candidate_solutions.append(score)
 
-    def prepare_result(self, error):
-        if error:
-            return
-
-        self._result = {
-            'max_evaluations': self._max_evaluations,
-            'evaluations': self._evaluations,
-            'chromosome': self._chromosome,
-            'score': self._score,
-            'candidate_solutions': self._candidate_solutions
-        }
-
-    def compute(self):
-        log.debug("%(algorithm)s is starging...", {"algorithm": self.name})
-        self._chromosome = Chromosome.random(self.variables, self.space)
+    def process(self, task):
+        self._chromosome = Chromosome.random(task.variables, task.space)
         self._score = self.evaluate(self._chromosome)
         self._evaluations = 1
         while self._evaluations < self._max_evaluations:
