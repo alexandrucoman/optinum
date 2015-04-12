@@ -14,9 +14,9 @@ class MISC:
     TRIES = 3        # defaul number of tries
 
 
-class DAEMON:
+class WORKER:
 
-    """Daemon specific settings."""
+    """Worker specific settings."""
 
     # default delay between complete processes and intensive iterations
     DELAY = 10
