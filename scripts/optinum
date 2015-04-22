@@ -1,44 +1,8 @@
 #!/usr/bin/env python
-from optinum import log
-from optinum import report
-from optinum.executor import ExecutorThread
 
 
 def main():
-    log.debug("Optinum is starting...")
-    reports = {}
-    tasks = [
-        report.Task(
-            objective='Rastrigin', variables=10,
-            start=-5.12, stop=5.12, precision=2,
-        ),
-        report.Task(
-            objective='Rosenbrock', variables=10,
-            start=-2.048, stop=2.048, precision=3,
-        ),
-        report.Task(
-            objective='Griewangk', variables=10,
-            start=-600, stop=600, precision=2
-        ),
-        report.Task(
-            objective='SixHumpCamelBack', variables=2,
-            start=-3, stop=3, precision=2,
-        ),
-    ]
-
-    executor = ExecutorThread()
-    executor.start()
-
-    for algorithm in ('HCFirstImprovement', 'HCBestImprovement'):
-        for task in tasks:
-            algorithm_report = report.HCReport(executor, algorithm, task)
-            reports[(algorithm, task)] = algorithm_report
-            print(algorithm_report.compute(execution_count=10))
-
-    log.debug("Optinum is shuting down...")
-    executor.join()
-    log.debug("Bye bye!")
-
+    pass
 
 if __name__ == "__main__":
     main()
