@@ -1,9 +1,15 @@
-"""
-Global settings.
-"""
-
-
+"""Global settings."""
 # pylint: disable=R0903, W0232, C1001
+
+
+class LOG:
+
+    """Logging default values."""
+
+    NAME = "bcbiovm"
+    LEVEL = 10
+    FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    FILE = ""
 
 
 class MISC:
