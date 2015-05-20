@@ -1,16 +1,19 @@
 """Base classes for workers."""
+# pylint: disable=abstract-method
 
 import abc
+import collections
 import six
 import time
 import threading
-
 try:
     import queue
 except ImportError:
     import Queue as queue
 
-# pylint: disable=abstract-method
+from optinum.common import utils
+
+LOG = utils.get_logger(__name__)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -184,3 +187,82 @@ class ConcurrentWorker(BaseWorker):
             if not task:
                 continue
             self._process(task)
+
+
+class Dispatcher(ConcurrentWorker):
+
+    """Base class for dispatching."""
+
+    def __init__(self, listener, *args, **kwargs):
+        """Init with custom values and take care of `listener` (server)."""
+        super(Dispatcher, self).__init__(*args, **kwargs)
+        self.listener = listener
+
+    def epilogue(self):
+        """Close server connection."""
+        self.listener.close()
+        super(Dispatcher, self).epilogue()
+
+    def task_generator(self):
+        """Listens for new requests (connections)."""
+        # pylint: disable=W0703
+        try:
+            task = self.listener.accept()
+            if task:
+                yield task
+        except Exception as exc:
+            if str(exc).find("The pipe is being closed") == -1:
+                LOG.error(exc)
+
+    def put_task(self, task):
+        """Pre-process the task as a new connection then add it
+        in the queue.
+        """
+        _task = collections.namedtuple("Task", ["data", "raw_data", "socket"])
+
+        try:
+            _dict = task.recv()
+        except EOFError:
+            LOG.error("The pipe is being closed")
+            return
+        except Exception as exc:
+            LOG.error("Error occurred while receiving: %(error)s",
+                      {"error": exc})
+            return
+
+        query = collections.namedtuple("Query", _dict.keys())
+        data = query(*_dict.values())
+
+        super(Dispatcher, self).put_task(_task(data, _dict, task))
+
+    def process(self, task):
+        """Treats a preprocessed request."""
+        try:
+            function = "handle_{}".format(task.data.request)
+        except AttributeError:
+            raise ValueError("Missing the request field from request")
+
+        try:
+            func = getattr(self, function)
+        except AttributeError:
+            raise ValueError("Function {} not defined".format(function))
+
+        try:
+            response = func(task)
+        except Exception as exc:
+            LOG.exception(exc)
+            raise
+
+        return response
+
+    def task_done(self, task, result):
+        """Sends the response back."""
+        try:
+            task.socket.send(result)
+        except EOFError as exc:
+            LOG.error(exc)
+        super(Dispatcher, self).task_done(task, result)
+
+    def task_fail(self, task, exc):
+        LOG.error(exc)
+        super(Dispatcher, self).task_fail(task, exc)
