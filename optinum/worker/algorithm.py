@@ -18,14 +18,6 @@ class Algorithm(base.BaseWorker):
     def status(self):
         return self._status
 
-    @property
-    def task(self):
-        return self._task
-
-    @task.setter
-    def task(self, task):
-        self._task = task
-
     def task_done(self, task, result):
         """What to execute after successfully finished processing a task."""
         super(Algorithm, self).task_done(task, result)
@@ -46,8 +38,3 @@ class Algorithm(base.BaseWorker):
         self._status = config.STATUS.DONE
         # TODO(alexandrucoman): Prepare the result
         super(Algorithm, self).epilogue()
-
-    def task_generator(self):
-        """Override this with your custom task generator."""
-        if self.task:
-            yield
