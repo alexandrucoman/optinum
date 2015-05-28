@@ -4,7 +4,7 @@ import random
 import six
 
 from optinum.worker import algorithm
-from optinum.data import Chromosome
+from optinum.common import objects
 
 __all__ = ['HCFirstImprovement', 'HCBestImprovement']
 
@@ -33,7 +33,8 @@ class HillClimbing(algorithm.Algorithm):
         self._score = score
 
     def process(self, task):
-        self._chromosome = Chromosome.random(task.variables, task.space)
+        self._chromosome = objects.Chromosome.random(task.variables,
+                                                     task.space)
         self._score = self.evaluate(self._chromosome)
         self._evaluations = 1
         while self._evaluations < self._max_evaluations:
@@ -65,7 +66,7 @@ class HCFirstImprovement(HillClimbing):
         for index in index_list:
             hamming_neighbor = list(genetic_info)
             hamming_neighbor[index] = int(not(genetic_info[index]))
-            yield Chromosome.from_raw(hamming_neighbor, self.space)
+            yield objects.Chromosome.from_raw(hamming_neighbor, self.space)
 
 
 class HCBestImprovement(HillClimbing):
@@ -79,4 +80,4 @@ class HCBestImprovement(HillClimbing):
         for index in range(len(genetic_info)):
             hamming_neighbor = list(genetic_info)
             hamming_neighbor[index] = int(not(genetic_info[index]))
-            yield Chromosome.from_raw(hamming_neighbor, self.space)
+            yield objects.Chromosome.from_raw(hamming_neighbor, self.space)

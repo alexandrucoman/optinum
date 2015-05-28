@@ -6,39 +6,12 @@ import random
 import numpy
 
 
-class Space(object):
-
-    def __init__(self, start, stop, precision=2):
-        size = (stop - start) * 10 ** precision
-        self._start = start
-        self._stop = stop
-        self._precision = precision
-        self._size = int(numpy.log2(size)) + 1
-
-    @property
-    def start(self):
-        return self._start
-
-    @property
-    def stop(self):
-        return self._stop
-
-    @property
-    def precision(self):
-        return self._precision
-
-    @property
-    def size(self):
-        return self._size
-
-
 class Gene(object):
 
-    def __init__(self, locus, allele, search_space):
+    def __init__(self, locus, allele):
         self._locus = locus
         self._allele = allele
         self._size = len(allele)
-        self._space = search_space
 
     @property
     def locus(self):
@@ -52,10 +25,9 @@ class Gene(object):
     def size(self):
         return self._size
 
-    def value(self):
+    def value(self, min_xi, precision):
         decimal = int(''.join(str(allel) for allel in self.allele), 2)
-        return (numpy.float64(decimal) / pow(10, self._space.precision) +
-                self._space.start)
+        return (numpy.float64(decimal) / pow(10, precision) + min_xi)
 
 
 class Chromosome(object):

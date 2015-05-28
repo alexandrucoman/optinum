@@ -1,4 +1,4 @@
-from optinum import config
+from optinum.common import config
 from optinum.worker import base
 
 
