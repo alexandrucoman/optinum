@@ -3,14 +3,14 @@ import random
 
 import six
 
-from optinum.worker import algorithm
+from optinum.algorithm import base
 from optinum.common import objects
 
 __all__ = ['HCFirstImprovement', 'HCBestImprovement']
 
 
 @six.add_metaclass(abc.ABCMeta)
-class HillClimbing(algorithm.Algorithm):
+class HillClimbing(base.Algorithm):
 
     def __init__(self, max_evaluations=50):
         super(HillClimbing, self).__init__()

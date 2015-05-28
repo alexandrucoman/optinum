@@ -1,8 +1,8 @@
 from optinum.common import config
-from optinum.worker import base
+from optinum.common import worker
 
 
-class Algorithm(base.BaseWorker):
+class Algorithm(worker.BaseWorker):
 
     def __init__(self, debug=config.MISC.DEBUG):
         super(Algorithm, self).__init__(debug=debug, delay=0, loop=False,
