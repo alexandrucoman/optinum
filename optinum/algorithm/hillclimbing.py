@@ -12,8 +12,8 @@ __all__ = ['HCFirstImprovement', 'HCBestImprovement']
 @six.add_metaclass(abc.ABCMeta)
 class HillClimbing(base.Algorithm):
 
-    def __init__(self, max_evaluations=50):
-        super(HillClimbing, self).__init__()
+    def __init__(self, name="HillClimbing", max_evaluations=50):
+        super(HillClimbing, self).__init__(name)
         self._evaluations = 1
         self._max_evaluations = max_evaluations
 
@@ -55,6 +55,9 @@ class HillClimbing(base.Algorithm):
 
 class HCFirstImprovement(HillClimbing):
 
+    def __init__(self, name="HillClimbing: First Improvement"):
+        super(HCFirstImprovement, self).__init__(name=name)
+
     @property
     def depth_search(self):
         return False
@@ -70,6 +73,9 @@ class HCFirstImprovement(HillClimbing):
 
 
 class HCBestImprovement(HillClimbing):
+
+    def __init__(self, name="HillClimbing: Best Improvement"):
+        super(HCFirstImprovement, self).__init__(name=name)
 
     @property
     def depth_search(self):

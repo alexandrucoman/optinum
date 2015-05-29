@@ -22,6 +22,9 @@ class Objective(object):
         self._name = self.__class__.__name__
         self._precision = precision
 
+    def __call__(self, chromosome):
+        return self.compute(chromosome)
+
     @property
     def name(self):
         return self._name
