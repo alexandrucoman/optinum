@@ -1,8 +1,40 @@
 #!/usr/bin/env python
+# PYTHON_ARGCOMPLETE_OK
+"""optinum command line application"""
+
+import argparse
+
+import argcomplete
+from argcomplete.completers import ChoicesCompleter
+
+from optinum import factory
+
+
+def setup():
+    """Setup the command line parser."""
+    parser = argparse.ArgumentParser()
+
+    subparser = parser.add_subparsers(title="[sub-commands]")
+    analysis = subparser.add_parser("analysis")
+
+    algorithm = analysis.add_argument("--algorithm", required=True)
+    objective = analysis.add_argument("--objective", required=True)
+    analysis.add_argument("--precision", type=int, default=2)
+    analysis.add_argument("--test-count", type=int, default=10)
+
+    objective.completer = ChoicesCompleter(factory.objective_function())
+    algorithm.completer = ChoicesCompleter(factory.algorithm())
+
+    return parser
 
 
 def main():
-    pass
+    """Run the an analysis with the received information."""
+    parser = setup()
+    argcomplete.autocomplete(parser)
+    args = parser.parse_args()
+    print(args)
+
 
 if __name__ == "__main__":
     main()
